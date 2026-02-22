@@ -1,0 +1,81 @@
+// This is your Prisma schema file
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id          String    @id
+  shop        String
+  state       String
+  isOnline    Boolean   @default(false)
+  scope       String?
+  expires     DateTime?
+  accessToken String
+  userId      BigInt?
+  firstName   String?
+  lastName    String?
+  email       String?
+  accountOwner Boolean  @default(false)
+  locale      String?
+  collaborator Boolean? @default(false)
+  emailVerified Boolean? @default(false)
+}
+
+model CartEvent {
+  id          String   @id @default(cuid())
+  shop        String
+  cartToken   String
+  customerId  String?
+  customerEmail String?
+  totalPrice  Float
+  currency    String   @default("EUR")
+  lineItems   String   // JSON string
+  status      String   @default("active") // active, abandoned, recovered, converted
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  abandonedAt DateTime?
+  recoveredAt DateTime?
+  emailSentAt DateTime?
+  source      String?  // web, mobile, pos
+  
+  @@index([shop])
+  @@index([cartToken])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model AbandonedCartEmail {
+  id          String   @id @default(cuid())
+  shop        String
+  cartToken   String
+  email       String
+  sentAt      DateTime @default(now())
+  opened      Boolean  @default(false)
+  clicked     Boolean  @default(false)
+  recovered   Boolean  @default(false)
+  
+  @@index([shop])
+  @@index([cartToken])
+}
+
+model AppSettings {
+  id                    String  @id @default(cuid())
+  shop                  String  @unique
+  abandonedThresholdMin Int     @default(60)  // minutes before cart is "abandoned"
+  emailEnabled          Boolean @default(false)
+  emailFrom             String?
+  emailSubject          String  @default("Ξεχάσατε κάτι στο καλάθι σας; 🛒")
+  emailBody             String?
+  smtpHost              String?
+  smtpPort              Int?
+  smtpUser              String?
+  smtpPass              String?
+  webhookSecret         String?
+  
+  @@index([shop])
+}

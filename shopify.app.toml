@@ -1,0 +1,24 @@
+name = "shopify-cart-tracker"
+client_id = "YOUR_CLIENT_ID_HERE"
+application_url = "https://YOUR-APP-URL.fly.dev"
+embedded = true
+
+[access_scopes]
+scopes = "read_customers,read_orders,read_checkouts,write_checkouts,read_analytics"
+
+[auth]
+redirect_urls = [
+  "https://YOUR-APP-URL.fly.dev/auth/callback",
+  "https://YOUR-APP-URL.fly.dev/auth/shopify/callback",
+  "https://YOUR-APP-URL.fly.dev/api/auth/callback"
+]
+
+[webhooks]
+api_version = "2024-01"
+
+  [[webhooks.subscriptions]]
+  topics = ["carts/create", "carts/update", "checkouts/create", "checkouts/update", "orders/create"]
+  uri = "/webhooks"
+
+[pos]
+embedded = false
